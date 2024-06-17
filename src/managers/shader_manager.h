@@ -11,17 +11,16 @@
 #include <sstream>
 
 #include <fmt/core.h>
-#include "../render/renderable_object.h"
+#include "../game_object/game_object.h"
+#include "../render/color.h"
 
 
 class ShaderManager {
    public:
     ShaderManager();
-    //  GLuint compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentShaderSource);
     GLuint compileAndLinkShaders();
     void loadShaderSourcesFromFile(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
-    void setOffset(const RenderableObject& obj);
-    void transform(const RenderableObject& obj);
+    void transform(glm::mat4 modelMatrix, Color* color);
 
    private:
     std::string m_vertexShaderSource;

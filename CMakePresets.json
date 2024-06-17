@@ -2,7 +2,7 @@
     "version": 2,
     "configurePresets": [
       {
-        "name": "opengl_test",
+        "name": "space_invaders",
         "generator": "Ninja",
         "binaryDir": "${sourceDir}/build",
         "cacheVariables": {

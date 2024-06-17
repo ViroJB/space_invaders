@@ -30,21 +30,17 @@ void ShaderManager::loadShaderSourcesFromFile(const std::string& vertexShaderPat
     fragmentShaderFile.close();
 }
 
-void ShaderManager::setOffset(const RenderableObject& obj) {
-    GLint offsetLoc = glGetUniformLocation(m_shaderProgram, "offset");
-    glUniform2fv(offsetLoc, 1, obj.position);
-}
-
-void ShaderManager::transform(const RenderableObject& obj) {
+void ShaderManager::transform(glm::mat4 modelMatrix, Color* color) {
     // glm::mat4 trans = glm::mat4(1.0f);
     // trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    // trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    // trans = glm::scale(trans, glm::vec3(1.0, 1.0, 1.0));
+    // trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
 
     GLint transformLoc = glGetUniformLocation(m_shaderProgram, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+    GLint colorLoc = glGetUniformLocation(m_shaderProgram, "uColor");
+    glUniform4f(colorLoc, color->r, color->g, color->b, color->a);
 }
 
 GLuint ShaderManager::compileAndLinkShaders() {

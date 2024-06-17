@@ -5,11 +5,11 @@ layout(location = 1) in vec4 color;
 
 out vec4 vertexColor;
 
-uniform vec2 offset;
 uniform mat4 transform;
+uniform vec4 uColor;
 
 void main() {
-    // gl_Position = vec4(position.xy + offset, position.z, 1.0);
     gl_Position = transform * vec4(position, 1.0f);
-    vertexColor = color;
+    // vertexColor = color;
+    vertexColor = uColor;
 }

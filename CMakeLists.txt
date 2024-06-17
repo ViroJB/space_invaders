@@ -2,14 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
-# set(VCPKG_TARGET_TRIPLET x64-windows)
 
-project(opengl_test)
-
-# set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};C:/Development/Tools/vcpkg/installed/x64-windows")
-
-# include_directories(C:\\Development\\Tools\\vcpkg\\installed\\x64-windows\\include)
-# link_directories(C:\\Development\\Tools\\vcpkg\\installed\\x64-windows\\lib)
+project(space_invaders)
 
 find_package(GTest 1.14.0 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
@@ -20,7 +14,7 @@ find_package(glfw3 CONFIG REQUIRED)
 
 find_package(glm CONFIG REQUIRED)
 
-add_executable(opengl_test 
+add_executable(space_invaders 
     src/app/app.cpp
     src/game/game.cpp
     src/input/input.cpp
@@ -30,6 +24,10 @@ add_executable(opengl_test
     src/managers/glfw_manager.cpp
     src/managers/shader_manager.cpp
     src/render/renderer.cpp
+    src/player/player.cpp
+    src/enemy/enemy.cpp
+    src/game_object/game_object.cpp
 )
-target_link_libraries(opengl_test PRIVATE fmt::fmt)
-target_link_libraries(opengl_test PRIVATE GLEW::GLEW OpenGL::GL glfw glm::glm)
+
+target_link_libraries(space_invaders PRIVATE fmt::fmt)
+target_link_libraries(space_invaders PRIVATE GLEW::GLEW OpenGL::GL glfw glm::glm)

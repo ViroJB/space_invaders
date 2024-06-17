@@ -27,12 +27,10 @@ class Game {
    private:
     GameState m_gameState;
     Input* m_input;
-    std::vector<RenderableObject> m_renderObjects;
     GLFWwindow* m_window;
     GlfwManager m_glfwManager;
     GlewManager m_glewManager;
-    BufferManager m_bufferManager;
     Renderer* m_renderer;
-
-    GLuint m_VAO, m_VBO;
+    GameObject* m_player;
+    std::vector<GameObject> m_enemies;
 };
