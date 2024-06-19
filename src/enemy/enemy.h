@@ -1,9 +1,9 @@
 #pragma once
 
 class Enemy {
-    public:
-        Enemy();
-        ~Enemy();
+   public:
+    Enemy();
+    ~Enemy();
 
-    private:
+   private:
 };

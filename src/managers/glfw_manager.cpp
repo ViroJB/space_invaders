@@ -19,6 +19,10 @@ GLFWwindow* GlfwManager::createWindow(int width, int height, const char* title) 
     
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwMakeContextCurrent(window);
+
+    // v-sync
+    glfwSwapInterval(0);
+
     return window;
 }
 

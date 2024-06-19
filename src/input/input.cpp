@@ -31,6 +31,22 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
                 break;
             case GLFW_KEY_ESCAPE:
                 input->m_keys[Key::ESC] = true;
+                break;
+            case GLFW_KEY_SPACE:
+                input->m_keys[Key::SPACE] = true;
+                break;
+            case GLFW_KEY_W:
+                input->m_keys[Key::W] = true;
+                break;
+            case GLFW_KEY_A:
+                input->m_keys[Key::A] = true;
+                break;
+            case GLFW_KEY_S:    
+                input->m_keys[Key::S] = true;
+                break;
+            case GLFW_KEY_D:
+                input->m_keys[Key::D] = true;
+                break;
         }
     } else if (action == GLFW_RELEASE) {
         switch (key) {
@@ -48,6 +64,22 @@ void Input::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
                 break;
             case GLFW_KEY_ESCAPE:
                 input->m_keys[Key::ESC] = false;
+                break;
+            case GLFW_KEY_SPACE:
+                input->m_keys[Key::SPACE] = false;
+                break;
+            case GLFW_KEY_W:
+                input->m_keys[Key::W] = false;
+                break;
+            case GLFW_KEY_A:
+                input->m_keys[Key::A] = false;
+                break;
+            case GLFW_KEY_S:
+                input->m_keys[Key::S] = false;
+                break;
+            case GLFW_KEY_D:
+                input->m_keys[Key::D] = false;
+                break;
         }
     }
 }

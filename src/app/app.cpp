@@ -7,6 +7,9 @@ App::App() {
 }
 
 int main() {
+    auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine gen2(seed);
+
     App* app = new App;
     return 0;
 }

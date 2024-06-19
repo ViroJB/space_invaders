@@ -2,18 +2,17 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <fmt/core.h>
+
+#include <fstream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
 #include <iostream>
-#include <fstream>
 #include <sstream>
 
-#include <fmt/core.h>
 #include "../game_object/game_object.h"
 #include "../render/color.h"
-
 
 class ShaderManager {
    public:

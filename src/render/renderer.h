@@ -4,13 +4,13 @@
 #include <GLFW/glfw3.h>
 #include <fmt/core.h>
 
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
 
 #include "../game_object/game_object.h"
-#include "../managers/shader_manager.h"
 #include "../managers/buffer_manager.h"
+#include "../managers/shader_manager.h"
 
 class Renderer {
    public:

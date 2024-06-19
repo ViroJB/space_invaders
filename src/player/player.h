@@ -1,9 +1,9 @@
 #pragma once
 
 class Player {
-    public:
-        Player();
-        ~Player();
+   public:
+    Player();
+    ~Player();
 
-    private:
+   private:
 };

@@ -5,7 +5,7 @@
 
 class Input {
    public:
-    enum class Key { UP, DOWN, LEFT, RIGHT, ESC };
+    enum class Key { UP, DOWN, LEFT, RIGHT, ESC, SPACE, W, A, S, D};
 
     Input(GLFWwindow* window);
     ~Input();
