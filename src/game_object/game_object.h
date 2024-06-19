@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <vector>
+#include <fmt/core.h>
 
 #include "../render/color.h"
 
@@ -16,7 +17,6 @@ class GameObject {
 
     std::vector<glm::vec3> calculateTriangleVertices();
     void rotateBy(float rotation);
-    void moveBy(glm::vec3 amount, float deltaTime);
     void moveLeft(float deltaTime);
     void moveRight(float deltaTime);
     void moveUp(float deltaTime);
@@ -32,6 +32,7 @@ class GameObject {
     glm::mat4 getModelMatrix();
     glm::vec3 getVelocity();
     BoundingBox getBoundingBox();
+    void calculateBoundingBox(std::vector<float> vertices);
 
     // public variables
     Color m_color;
@@ -41,6 +42,7 @@ class GameObject {
     bool m_isInitialized = false;
 
     float m_speed = 1.0f;
+    float m_rotation = 0.0f;
     glm::mat4 m_modelMatrix = glm::mat4(1.0f);
     glm::vec3 m_velocity = glm::vec3(0.0f, 0.0f, 0.0f);
 };

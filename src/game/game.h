@@ -6,6 +6,7 @@
 
 #include <thread>
 #include <vector>
+#include <list>
 #include <random>
 
 #include "../input/input.h"
@@ -24,6 +25,11 @@ class Game {
     void run();
     void cleanup();
     void updateEnemies(float deltaTime);
+    void updateProjectiles(float deltaTime);
+    void spawnEnemy();
+    void spawnProjectile();
+
+    void printAllBoundingBoxes();
 
    private:
     GameState m_gameState;
@@ -33,5 +39,10 @@ class Game {
     GlewManager m_glewManager;
     Renderer* m_renderer;
     GameObject* m_player;
-    std::vector<GameObject> m_enemies;
+    std::list<GameObject> m_enemies;
+    std::list<GameObject> m_projectiles;
+
+    std::vector<std::vector<float>> m_vertices;
+
+
 };
