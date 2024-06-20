@@ -149,14 +149,39 @@ void Game::run() {
         }
 
         // update gamestate
+        checkForCollisions();
         updateEnemies(deltaTime);
         updateProjectiles(deltaTime);
 
         // render
         m_renderer->render(m_window, m_enemies, m_player, m_projectiles);
 
-        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         lastFrameTime = currentTime;
+    }
+}
+
+void Game::checkForCollisions() {
+    // check for collisions between enemies and projectiles
+    for (auto enemy = m_enemies.begin(); enemy != m_enemies.end();) {
+        bool enemyErased = false;
+        for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();) {
+            if (enemy->getBoundingBox().x < projectile->getBoundingBox().x + projectile->getBoundingBox().width &&
+                enemy->getBoundingBox().x + enemy->getBoundingBox().width > projectile->getBoundingBox().x &&
+                enemy->getBoundingBox().y < projectile->getBoundingBox().y + projectile->getBoundingBox().height &&
+                enemy->getBoundingBox().y + enemy->getBoundingBox().height > projectile->getBoundingBox().y) {
+                fmt::print("Collision detected\n");
+                enemy = m_enemies.erase(enemy);
+                projectile = m_projectiles.erase(projectile);
+                enemyErased = true;
+                break; // Exit inner loop since the current enemy is erased
+            } else {
+                ++projectile;
+            }
+        }
+        if (!enemyErased) {
+            ++enemy;
+        }
     }
 }
 

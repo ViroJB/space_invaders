@@ -28,6 +28,7 @@ class Game {
     void updateProjectiles(float deltaTime);
     void spawnEnemy();
     void spawnProjectile();
+    void checkForCollisions();
 
     void printAllBoundingBoxes();
 
