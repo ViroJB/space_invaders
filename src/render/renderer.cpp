@@ -77,27 +77,27 @@ void Renderer::initializeVertexData(std::vector<std::vector<float>> vertices) {
     glBindVertexArray(0);
 }
 
-void Renderer::render(GLFWwindow* window, std::list<GameObject>& enemies, GameObject* player, std::list<GameObject>& projectiles) {
+void Renderer::render(GLFWwindow* window, std::list<Enemy>& enemies, GameObject* player, std::list<GameObject>& projectiles) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // draw enemies
     for (auto& obj : enemies) {
-        m_shaderManager.transform(obj.getModelMatrix(), &obj.m_color);
+        m_shaderManager.transform(obj.getGameObject()->getModelMatrix(), obj.getGameObject()->getColor());
         glBindVertexArray(m_enemyVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
     // draw projectiles
     for (auto& obj : projectiles) {
-        m_shaderManager.transform(obj.getModelMatrix(), &obj.m_color);
+        m_shaderManager.transform(obj.getModelMatrix(), obj.getColor());
         glBindVertexArray(m_projectileVAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
     // draw player
     glBindVertexArray(m_playerVAO);
-    m_shaderManager.transform(player->getModelMatrix(), &player->m_color);
+    m_shaderManager.transform(player->getModelMatrix(), player->getColor());
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glfwSwapBuffers(window);

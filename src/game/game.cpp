@@ -1,13 +1,12 @@
 #include "game.h"
 
+// TODO if the renderer only takes in a gamestate, we could save that gamestate and redraw it, frame by frame
 Game::Game() {
     m_glfwManager.initialize();
-
     m_window = m_glfwManager.createWindow(800, 600, "Space Invaders Clone");
-
     m_glewManager.initialize();
 
-    // more temp stuff
+    // note more temp stuff
     std::vector<float> playerVertices = {
         // position            // color + alpha
         -0.875f, 1.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // top, red
@@ -22,9 +21,9 @@ Game::Game() {
     };
     std::vector<float> projectileVertices = {
         // position            // color + alpha
-        -0.875f, 1.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // top, red
-        -1.00f,  0.75f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // bottom left, green
-        -0.75f,  0.75f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f   // bottom right, blue
+        -0.985f, 1.0f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,  // top, red
+        -1.0f,   0.85f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,  // bottom left, green
+        -0.97f,  0.85f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f   // bottom right, blue
     };
     m_vertices.push_back(playerVertices);
     m_vertices.push_back(enemyVertices);
@@ -39,9 +38,7 @@ Game::Game() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  // enable transparency
 
     // note temp stuff
-    m_player = new GameObject(0.875f, -1.75f, {0.5f, 0.1f, 0.2f, 1.0f});
-    m_player->setSpeed(5.0f);
-    m_player->calculateBoundingBox(m_vertices[0]);
+    m_player = new Player(&m_vertices[0], {0.5f, 0.1f, 0.2f, 1.0f});
 }
 
 void Game::spawnProjectile() {
@@ -52,19 +49,35 @@ void Game::spawnProjectile() {
     std::uniform_real_distribution<float> disPositionY(-2.0f, 0.0f);
     std::uniform_real_distribution<float> disColor(0.0f, 1.0f);
 
-    GameObject projectile = GameObject(m_player->getBoundingBox().x, m_player->getBoundingBox().y, {0.1f, 0.1f, 0.1f, 1.0f});
-    projectile.calculateBoundingBox(m_vertices[2]);
+    BoundingBox* playerBoundingBox = m_player->getGameObject()->getBoundingBox();
+    float x = playerBoundingBox->x + playerBoundingBox->width / 2;
+    float y = playerBoundingBox->y + playerBoundingBox->height;
+
+    // center the projectile above the player, currently manually
+    x -= 0.017f;
+    y -= 0.11f;
+
+    GameObject projectile = GameObject(x, y, &m_vertices[2]);
+    projectile.calculateBoundingBox(&m_vertices[2]);
     projectile.setSpeed(5.0f);
+    projectile.setColor({0.15f, 0.15f, 0.15f, 1.0f});
     m_projectiles.push_back(projectile);
+
+    m_player->triggerShootingCooldown();
+
+    // print boundingbox of projectile
+    // auto projectileBoundingBox = projectile.getBoundingBox();
+    // fmt::print("Projectile bounding box: x: {}, y: {}, width: {}, height: {}\n", projectileBoundingBox->x, projectileBoundingBox->y,
+    //            projectileBoundingBox->width, projectileBoundingBox->height);
 }
 
 void Game::updateProjectiles(float deltaTime) {
     for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();) {
         projectile->moveUp(deltaTime);
 
-        if (projectile->getBoundingBox().y > 0.0f) {
+        if (projectile->getBoundingBox()->y > 0.0f) {
             projectile = m_projectiles.erase(projectile);  // erase returns the iterator to the next valid element
-            fmt::print("Projectile removed\n");
+            // fmt::print("Projectile removed\n");
         } else {
             ++projectile;  // move to the next element
         }
@@ -79,8 +92,8 @@ void Game::spawnEnemy() {
     std::uniform_real_distribution<float> disPositionY(-2.0f, 0.0f);
     std::uniform_real_distribution<float> disColor(0.0f, 1.0f);
 
-    GameObject enemy = GameObject(disPositionX(gen), 0.0f, {disColor(gen), disColor(gen), disColor(gen), 1.0f});
-    enemy.calculateBoundingBox(m_vertices[1]);
+    Enemy enemy = Enemy(disPositionX(gen), 0.0f, &m_vertices[1]);
+    enemy.setColor({disColor(gen), disColor(gen), disColor(gen), 1.0f});
     m_enemies.push_back(enemy);
 }
 
@@ -93,13 +106,17 @@ void Game::updateEnemies(float deltaTime) {
     for (auto enemy = m_enemies.begin(); enemy != m_enemies.end();) {
         enemy->moveDown(deltaTime);
 
-        if (enemy->getBoundingBox().y < -2.0f) {
+        if (enemy->getBoundingBox()->y < -2.0f) {
             enemy = m_enemies.erase(enemy);  // erase returns the iterator to the next valid element
-            fmt::print("Enemy removed\n");
+            // fmt::print("Enemy removed\n");
         } else {
             ++enemy;  // move to the next element
         }
     }
+}
+
+void Game::updatePlayer(float deltaTime) {
+    m_player->updateShootingCooldown(deltaTime);
 }
 
 void Game::run() {
@@ -115,66 +132,147 @@ void Game::run() {
 
         // process input
         if (m_input->isKeyPressed(Input::Key::UP) || m_input->isKeyPressed(Input::Key::W)) {
-            fmt::print("UP key pressed\n");
             m_player->moveUp(deltaTime);
         }
         if (m_input->isKeyPressed(Input::Key::DOWN) || m_input->isKeyPressed(Input::Key::S)) {
-            fmt::print("DOWN key pressed\n");
             m_player->moveDown(deltaTime);
         }
         if (m_input->isKeyPressed(Input::Key::LEFT) || m_input->isKeyPressed(Input::Key::A)) {
-            fmt::print("LEFT key pressed\n");
             m_player->moveLeft(deltaTime);
         }
         if (m_input->isKeyPressed(Input::Key::RIGHT) || m_input->isKeyPressed(Input::Key::D)) {
-            fmt::print("RIGHT key pressed\n");
             m_player->moveRight(deltaTime);
         }
         if (m_input->isKeyPressed(Input::Key::SPACE)) {
-            fmt::print("SPACE key pressed\n");
-            spawnProjectile();
-            printAllBoundingBoxes();
+            if (m_player->getShootingCooldown() <= 0.0f) {
+                spawnProjectile();
+            }
+            // printAllBoundingBoxes();
         }
         if (m_input->isKeyPressed(Input::Key::ESC)) {
             fmt::print("ESC key pressed\n");
 
-            m_renderer->printCurrentMatrix(m_player);
-            m_renderer->printCurrentMatrix(&m_enemies.front());
+            // printAllBoundingBoxes();
+            // m_renderer->printCurrentMatrix(m_player->getGameObject());
+            // m_renderer->printCurrentMatrix(&m_enemies.front());
             // print bounding box of player
-            auto playerBoundingBox = m_player->getBoundingBox();
-            fmt::print("Player bounding box: x: {}, y: {}, width: {}, height: {}\n", playerBoundingBox.x, playerBoundingBox.y,
-                       playerBoundingBox.width, playerBoundingBox.height);
+            // auto playerBoundingBox = m_player->getGameObject()->getBoundingBox();
+            // fmt::print("Player bounding box: x: {}, y: {}, width: {}, height: {}\n", playerBoundingBox->x, playerBoundingBox->y,
+            //            playerBoundingBox->width, playerBoundingBox->height);
 
             glfwSetWindowShouldClose(m_window, GLFW_TRUE);
         }
 
         // update gamestate
-        checkForCollisions();
+        checkForBoxCollisions();
         updateEnemies(deltaTime);
         updateProjectiles(deltaTime);
+        updatePlayer(deltaTime);
 
         // render
-        m_renderer->render(m_window, m_enemies, m_player, m_projectiles);
+        m_renderer->render(m_window, m_enemies, m_player->getGameObject(), m_projectiles);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(10));
         lastFrameTime = currentTime;
     }
 }
 
-void Game::checkForCollisions() {
+bool Game::checkForPreciseCollision(GameObject& object1, GameObject& object2) {
+    // Get the transformation matrices for both objects
+    glm::mat4 transform1 = object1.getModelMatrix();
+    glm::mat4 transform2 = object2.getModelMatrix();
+
+    // Get and transform vertices
+    auto object1Vertices = object1.getVertices();
+    auto object2Vertices = object2.getVertices();
+
+    std::vector<glm::vec2> transformedVertices1 = transformVertices(*object1Vertices, transform1);
+    std::vector<glm::vec2> transformedVertices2 = transformVertices(*object2Vertices, transform2);
+
+    bool collision = checkForSATCollision(transformedVertices1, transformedVertices2);
+
+    return collision;
+}
+
+bool Game::checkForSATCollision(const std::vector<glm::vec2>& vertices1, const std::vector<glm::vec2>& vertices2) {
+    std::vector<glm::vec2> axes;
+
+    // Get the axes from the first polygon
+    for (size_t i = 0; i < vertices1.size(); ++i) {
+        glm::vec2 p1 = vertices1[i];
+        glm::vec2 p2 = vertices1[(i + 1) % vertices1.size()];
+        glm::vec2 edge = p2 - p1;
+        glm::vec2 axis(-edge.y, edge.x);  // Perpendicular to edge
+        axis = glm::normalize(axis);
+        axes.push_back(axis);
+    }
+
+    // Get the axes from the second polygon
+    for (size_t i = 0; i < vertices2.size(); ++i) {
+        glm::vec2 p1 = vertices2[i];
+        glm::vec2 p2 = vertices2[(i + 1) % vertices2.size()];
+        glm::vec2 edge = p2 - p1;
+        glm::vec2 axis(-edge.y, edge.x);  // Perpendicular to edge
+        axis = glm::normalize(axis);
+        axes.push_back(axis);
+    }
+
+    // Check for overlap on all axes
+    for (const auto& axis : axes) {
+        if (!overlapOnAxis(vertices1, vertices2, axis)) {
+            return false;  // No collision
+        }
+    }
+
+    return true;  // Collision detected
+}
+
+bool Game::overlapOnAxis(const std::vector<glm::vec2>& vertices1, const std::vector<glm::vec2>& vertices2, const glm::vec2& axis) {
+    float min1 = FLT_MAX, max1 = -FLT_MAX;
+    float min2 = FLT_MAX, max2 = -FLT_MAX;
+
+    for (const auto& vertex : vertices1) {
+        float projection = glm::dot(vertex, axis);
+        min1 = std::min(min1, projection);
+        max1 = std::max(max1, projection);
+    }
+
+    for (const auto& vertex : vertices2) {
+        float projection = glm::dot(vertex, axis);
+        min2 = std::min(min2, projection);
+        max2 = std::max(max2, projection);
+    }
+
+    return !(max1 < min2 || max2 < min1);
+}
+
+std::vector<glm::vec2> Game::transformVertices(const std::vector<float>& vertices, const glm::mat4& transform) {
+    std::vector<glm::vec2> transformedVertices;
+    for (size_t i = 0; i < vertices.size(); i += 7) {  // assuming vertices are stored as x, y, z, r, g, b, a
+        glm::vec4 vertex(vertices[i], vertices[i + 1], vertices[i + 2], 1.0f);
+        glm::vec4 transformedVertex = transform * vertex;
+        transformedVertices.push_back(glm::vec2(transformedVertex));
+    }
+    return transformedVertices;
+}
+
+void Game::checkForBoxCollisions() {
     // check for collisions between enemies and projectiles
     for (auto enemy = m_enemies.begin(); enemy != m_enemies.end();) {
         bool enemyErased = false;
         for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();) {
-            if (enemy->getBoundingBox().x < projectile->getBoundingBox().x + projectile->getBoundingBox().width &&
-                enemy->getBoundingBox().x + enemy->getBoundingBox().width > projectile->getBoundingBox().x &&
-                enemy->getBoundingBox().y < projectile->getBoundingBox().y + projectile->getBoundingBox().height &&
-                enemy->getBoundingBox().y + enemy->getBoundingBox().height > projectile->getBoundingBox().y) {
-                fmt::print("Collision detected\n");
-                enemy = m_enemies.erase(enemy);
-                projectile = m_projectiles.erase(projectile);
-                enemyErased = true;
-                break; // Exit inner loop since the current enemy is erased
+            if (enemy->getBoundingBox()->x < projectile->getBoundingBox()->x + projectile->getBoundingBox()->width &&
+                enemy->getBoundingBox()->x + enemy->getBoundingBox()->width > projectile->getBoundingBox()->x &&
+                enemy->getBoundingBox()->y < projectile->getBoundingBox()->y + projectile->getBoundingBox()->height &&
+                enemy->getBoundingBox()->y + enemy->getBoundingBox()->height > projectile->getBoundingBox()->y) {
+                // fmt::print("Collision detected\n");
+                if (checkForPreciseCollision(*enemy->getGameObject(), *projectile)) {
+                    // fmt::print("Precise collision detected\n");
+                    enemy = m_enemies.erase(enemy);
+                    projectile = m_projectiles.erase(projectile);
+                    enemyErased = true;
+                }
+                break;  // Exit inner loop since the current enemy is erased
             } else {
                 ++projectile;
             }
@@ -182,27 +280,6 @@ void Game::checkForCollisions() {
         if (!enemyErased) {
             ++enemy;
         }
-    }
-}
-
-void Game::printAllBoundingBoxes() {
-    // print bounding box of player
-    auto playerBoundingBox = m_player->getBoundingBox();
-    fmt::print("Player bounding box: x: {}, y: {}, width: {}, height: {}\n", playerBoundingBox.x, playerBoundingBox.y,
-               playerBoundingBox.width, playerBoundingBox.height);
-
-    // print bounding box of enemies
-    for (auto& enemy : m_enemies) {
-        auto enemyBoundingBox = enemy.getBoundingBox();
-        fmt::print("Enemy bounding box: x: {}, y: {}, width: {}, height: {}\n", enemyBoundingBox.x, enemyBoundingBox.y,
-                   enemyBoundingBox.width, enemyBoundingBox.height);
-    }
-
-    // print bounding box of projectiles
-    for (auto& projectile : m_projectiles) {
-        auto projectileBoundingBox = projectile.getBoundingBox();
-        fmt::print("Projectile bounding box: x: {}, y: {}, width: {}, height: {}\n", projectileBoundingBox.x, projectileBoundingBox.y,
-                   projectileBoundingBox.width, projectileBoundingBox.height);
     }
 }
 

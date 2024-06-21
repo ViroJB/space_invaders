@@ -10,6 +10,7 @@
 #include <list>
 
 #include "../game_object/game_object.h"
+#include "../enemy/enemy.h"
 #include "../managers/buffer_manager.h"
 #include "../managers/shader_manager.h"
 
@@ -17,7 +18,7 @@ class Renderer {
    public:
     Renderer();
     void initializeVertexData(std::vector<std::vector<float>> vertices);
-    void render(GLFWwindow* window, std::list<GameObject>& enemies, GameObject* player, std::list<GameObject>& projectiles);
+    void render(GLFWwindow* window, std::list<Enemy>& enemies, GameObject* player, std::list<GameObject>& projectiles);
     void setShaderProgram(GLuint shaderProgram);
     GLuint getShaderProgram();
     // std::array<GLfloat, 21> getCombinedData(GameObject* obj);
