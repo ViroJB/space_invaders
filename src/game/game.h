@@ -18,6 +18,7 @@
 #include "../game_object/game_object.h"
 #include "../player/player.h"
 #include "../enemy/enemy.h"
+#include "../collision_detection/collision_detection.h"
 
 struct GameState {};
 
@@ -45,6 +46,7 @@ class Game {
     GLFWwindow* m_window;
     GlfwManager m_glfwManager;
     GlewManager m_glewManager;
+    CollisionDetection m_collisionDetection;
     Renderer* m_renderer;
     Player* m_player;
     std::list<Enemy> m_enemies;

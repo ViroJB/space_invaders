@@ -98,19 +98,39 @@ void Game::spawnEnemy() {
 }
 
 void Game::updateEnemies(float deltaTime) {
+    // enemies should never be 0 with this, so no zero check needed
     if (m_enemies.size() <= 9) {
         spawnEnemy();
     }
 
-    // this feels so wrong...
+    // this feels weird
     for (auto enemy = m_enemies.begin(); enemy != m_enemies.end();) {
+        bool enemyErased = false;
+        if (!m_projectiles.empty()) {
+            for (auto projectile = m_projectiles.begin(); projectile != m_projectiles.end();) {
+                // delete enemy and projectile on collition
+                if (m_collisionDetection.isColliding(enemy->getGameObject(), &(*projectile))) {
+                    enemy = m_enemies.erase(enemy);
+                    projectile = m_projectiles.erase(projectile);
+                    enemyErased = true;
+                    break;  // enemy is also deleted, so fully breakout
+                } else {
+                    ++projectile;
+                }
+            }
+        }
+
+        if (enemyErased) {
+            continue;
+        }
+
         enemy->moveDown(deltaTime);
 
+        // delete enemy if it goes off screen
         if (enemy->getBoundingBox()->y < -2.0f) {
             enemy = m_enemies.erase(enemy);  // erase returns the iterator to the next valid element
-            // fmt::print("Enemy removed\n");
         } else {
-            ++enemy;  // move to the next element
+            ++enemy;
         }
     }
 }
@@ -150,21 +170,10 @@ void Game::run() {
             // printAllBoundingBoxes();
         }
         if (m_input->isKeyPressed(Input::Key::ESC)) {
-            fmt::print("ESC key pressed\n");
-
-            // printAllBoundingBoxes();
-            // m_renderer->printCurrentMatrix(m_player->getGameObject());
-            // m_renderer->printCurrentMatrix(&m_enemies.front());
-            // print bounding box of player
-            // auto playerBoundingBox = m_player->getGameObject()->getBoundingBox();
-            // fmt::print("Player bounding box: x: {}, y: {}, width: {}, height: {}\n", playerBoundingBox->x, playerBoundingBox->y,
-            //            playerBoundingBox->width, playerBoundingBox->height);
-
             glfwSetWindowShouldClose(m_window, GLFW_TRUE);
         }
 
         // update gamestate
-        checkForBoxCollisions();
         updateEnemies(deltaTime);
         updateProjectiles(deltaTime);
         updatePlayer(deltaTime);
