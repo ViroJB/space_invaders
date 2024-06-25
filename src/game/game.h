@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <fmt/core.h>
 
 #include <list>
@@ -9,8 +8,8 @@
 #include <thread>
 #include <vector>
 
+#include "../timer/timer.h"
 #include "../input/input.h"
-#include "../managers/buffer_manager.h"
 #include "../managers/glew_manager.h"
 #include "../managers/glfw_manager.h"
 #include "../managers/shader_manager.h"
@@ -27,30 +26,30 @@ class Game {
     Game();
     void run();
     void cleanup();
-    void updateEnemies(float deltaTime);
-    void updateProjectiles(float deltaTime);
-    void spawnEnemy();
-    void spawnProjectile();
-    void checkForBoxCollisions();
-    bool checkForPreciseCollision(GameObject& object1, GameObject& object2);
 
-    std::vector<glm::vec2> transformVertices(const std::vector<float>& vertices, const glm::mat4& transform);
-    bool checkForSATCollision(const std::vector<glm::vec2>& vertices1, const std::vector<glm::vec2>& vertices2);
-    bool overlapOnAxis(const std::vector<glm::vec2>& vertices1, const std::vector<glm::vec2>& vertices2, const glm::vec2& axis);
+    std::vector<std::vector<float>> getVertices();
+    float getRandomNumber(float min, float max);
 
     void updatePlayer(float deltaTime);
+    void updateEnemies(float deltaTime);
+    void updateProjectiles(float deltaTime);
+
+    void spawnEnemy();
+    void spawnProjectile();
 
    private:
     GameState m_gameState;
-    Input* m_input;
+    std::vector<std::vector<float>> m_vertices;
     GLFWwindow* m_window;
     GlfwManager m_glfwManager;
     GlewManager m_glewManager;
+
+    Input* m_input;
     CollisionDetection m_collisionDetection;
     Renderer* m_renderer;
+
     Player* m_player;
     std::list<Enemy> m_enemies;
     std::list<GameObject> m_projectiles;
 
-    std::vector<std::vector<float>> m_vertices;
 };

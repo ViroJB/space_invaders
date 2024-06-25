@@ -17,9 +17,9 @@ find_package(glm CONFIG REQUIRED)
 add_executable(space_invaders 
     src/app/app.cpp
     src/game/game.cpp
+    src/timer/timer.cpp
     src/input/input.cpp
     src/config/config.cpp
-    src/managers/buffer_manager.cpp
     src/managers/glew_manager.cpp
     src/managers/glfw_manager.cpp
     src/managers/shader_manager.cpp
@@ -41,7 +41,6 @@ add_executable(tests
     src/game/game.cpp
     src/input/input.cpp
     src/config/config.cpp
-    src/managers/buffer_manager.cpp
     src/managers/glew_manager.cpp
     src/managers/glfw_manager.cpp
     src/managers/shader_manager.cpp

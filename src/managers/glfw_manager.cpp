@@ -20,8 +20,9 @@ GLFWwindow* GlfwManager::createWindow(int width, int height, const char* title) 
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     glfwMakeContextCurrent(window);
 
-    // v-sync
-    glfwSwapInterval(0);
+    glfwSwapInterval(0);                                // disable v-sync (0 false, 1 true)
+    glEnable(GL_BLEND);                                 // enable blending
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  // enable transparency
 
     return window;
 }

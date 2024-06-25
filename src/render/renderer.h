@@ -11,7 +11,6 @@
 
 #include "../game_object/game_object.h"
 #include "../enemy/enemy.h"
-#include "../managers/buffer_manager.h"
 #include "../managers/shader_manager.h"
 
 class Renderer {
@@ -27,8 +26,6 @@ class Renderer {
    private:
     ShaderManager m_shaderManager = ShaderManager();
     GLuint m_shaderProgram;
-    BufferManager m_bufferManager;
-    GLuint m_VAO, m_VBO;
     GLuint m_playerVAO, m_playerVBO;
     GLuint m_enemyVAO, m_enemyVBO;
     GLuint m_projectileVAO, m_projectileVBO;

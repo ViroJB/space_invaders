@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 Renderer::Renderer() {
-    m_bufferManager.setupBuffers(m_VAO, m_VBO);
     m_shaderProgram = m_shaderManager.compileAndLinkShaders();
     glUseProgram(m_shaderProgram);
 }

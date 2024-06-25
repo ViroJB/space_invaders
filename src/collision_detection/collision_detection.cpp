@@ -19,6 +19,7 @@ bool CollisionDetection::isColliding(GameObject* object1, GameObject* object2) {
 
         collision = hasSATCollision(&transformedVertices1, &transformedVertices2);
     }
+
     return collision;
 }
 
@@ -87,32 +88,6 @@ std::vector<glm::vec2> CollisionDetection::transformVertices(const std::vector<f
         glm::vec4 transformedVertex = transform * vertex;
         transformedVertices.push_back(glm::vec2(transformedVertex));
     }
+
     return transformedVertices;
 }
-
-// bool CollisionDetection::hasBoxCollision(std::list<GameObject>& enemies, std::list<GameObject>& projectiles) {
-//     // check for collisions between enemies and projectiles
-//     for (auto enemy = enemies.begin(); enemy != enemies.end();) {
-//         bool enemyErased = false;
-//         for (auto projectile = projectiles.begin(); projectile != projectiles.end();) {
-//             if (enemy->getBoundingBox()->x < projectile->getBoundingBox()->x + projectile->getBoundingBox()->width &&
-//                 enemy->getBoundingBox()->x + enemy->getBoundingBox()->width > projectile->getBoundingBox()->x &&
-//                 enemy->getBoundingBox()->y < projectile->getBoundingBox()->y + projectile->getBoundingBox()->height &&
-//                 enemy->getBoundingBox()->y + enemy->getBoundingBox()->height > projectile->getBoundingBox()->y) {
-//                 // fmt::print("Collision detected\n");
-//                 if (checkForPreciseCollision(*enemy, *projectile)) {
-//                     // fmt::print("Precise collision detected\n");
-//                     enemy = enemies.erase(enemy);
-//                     projectile = projectiles.erase(projectile);
-//                     enemyErased = true;
-//                 }
-//                 break;  // exit inner loop since the current enemy is erased
-//             } else {
-//                 ++projectile;
-//             }
-//         }
-//         if (!enemyErased) {
-//             ++enemy;
-//         }
-//     }
-// }
